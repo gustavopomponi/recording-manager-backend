@@ -9,9 +9,9 @@ module.exports = (app, db) => {
 
   app.get('/dispositions', recordingController.listaDisposition);
 
-  app.get('/origens', recordingController.listaOrigem);
+  app.get('/origens/:dtInicial/:dtFinal', recordingController.listaOrigem);
 
-  app.get('/destinos', recordingController.listaDestino);
+  app.get('/destinos/:dtInicial/:dtFinal/:source', recordingController.listaDestino);
 
   // GET Calls by date interval
   //app.get('/recordings/:dt_inicial/:dt_final/:src?/:dst?/:status?', recordingController.busca);
@@ -27,7 +27,7 @@ module.exports = (app, db) => {
     parametros.status = req.params[4];
 
     recordingController.busca(parametros,res);
-    
+
   });
 
 /*

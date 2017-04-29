@@ -8,6 +8,7 @@
     "start": "node ./index.js"
   },
   "dependencies": {
+    "angular-resource": "^1.6.4",
     "express": "~3.4.7",
     "json-lint": "~0.1.0",
     "mysql": "^2.13.0",

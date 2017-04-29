@@ -6,7 +6,10 @@ var sequelize = db.sequelize;
 
     exports.lista = function(req,res){
 
-         sequelize.query('SELECT	calldate,	src, dst,	duration,	billsec FROM cdr WHERE LENGTH(dst) > 5',{ type: sequelize.QueryTypes.SELECT })
+         sequelize.query('SELECT cast(calldate as date) as calldate,	src, dst,	duration,	disposition FROM cdr WHERE LENGTH(dst) > 5',
+                  {
+                    type: sequelize.QueryTypes.SELECT
+                  })
                      .then(recs => res.status(201).send(recs))
                      .catch(error => res.status(400).send(error));
 
@@ -22,7 +25,11 @@ var sequelize = db.sequelize;
 
       exports.listaOrigem = function(req,res){
 
-             sequelize.query('select DISTINCT(src) from cdr WHERE dst <> "s"',{ type: sequelize.QueryTypes.SELECT })
+             sequelize.query('select DISTINCT(src) from cdr WHERE dst <> "s" AND cast(calldate as date) between :inicial and :final AND length(recordingfile) > 1',
+                     { replacements: { inicial: req.params.dtInicial,
+                                       final: req.params.dtFinal },
+                                       type: sequelize.QueryTypes.SELECT
+                     })
                          .then(recs => res.status(201).send(recs))
                          .catch(error => res.status(400).send(error));
 
@@ -30,7 +37,12 @@ var sequelize = db.sequelize;
 
       exports.listaDestino = function(req,res){
 
-                 sequelize.query('select DISTINCT(dst) from cdr WHERE dst <> "s"',{ type: sequelize.QueryTypes.SELECT })
+                 sequelize.query('select DISTINCT(dst) from cdr WHERE dst <> "s" AND cast(calldate as date) between :inicial and :final AND src = :source and length(recordingfile) > 1',
+                         { replacements: { inicial: req.params.dtInicial,
+                                           final: req.params.dtFinal,
+                                           source: req.params.source },
+                                           type: sequelize.QueryTypes.SELECT
+                         })
                              .then(recs => res.status(201).send(recs))
                              .catch(error => res.status(400).send(error));
 
@@ -43,7 +55,8 @@ var sequelize = db.sequelize;
                             +' billsec, disposition FROM cdr'
                             +' WHERE cast(calldate as date)'
                             +' between :inicial and :final and'
-                            +' dst <> "s"';
+                            +' dst <> "s" and'
+                            +' length(recordingfile) > 1';
 
           if( req.src.length > 1){
 
