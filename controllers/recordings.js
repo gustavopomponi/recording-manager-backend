@@ -1,8 +1,26 @@
 'use strict';
 
 const db = require('../config/db');
+const player = require('play-sound')({});
+const ms = require('mediaserver');
+//var play = require('play');
 
 var sequelize = db.sequelize;
+
+   exports.playaudio = function(req,res){
+
+      ms.pipe(req, res, "./audio/out-0999553028-2010-20170502-090412-1493726652.1057.wav");
+
+   }
+
+//	player.play('../audio/out-0999553028-2010-20170502-090412-1493726652.1057.wav', function(err){
+  		//if (err) throw err
+//	});
+
+	//play.usePlayer('mplayer');
+	//play.sound('../audio/out-0999553028-2010-20170502-090412-1493726652.1057.wav');
+
+//    },
 
     exports.lista = function(req,res){
 
@@ -52,7 +70,7 @@ var sequelize = db.sequelize;
 
         var querytext =      'SELECT	calldate,'
                             +' src, dst,	duration,'
-                            +' billsec, disposition FROM cdr'
+                            +' billsec, disposition, recordingfile FROM cdr'
                             +' WHERE cast(calldate as date)'
                             +' between :inicial and :final and'
                             +' dst <> "s" and'

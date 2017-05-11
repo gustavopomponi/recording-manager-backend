@@ -7,6 +7,8 @@ module.exports = (app, db) => {
   // GET All Calls
   app.get('/recordings', recordingController.lista);
 
+  app.get('/play', recordingController.playaudio);
+
   app.get('/dispositions', recordingController.listaDisposition);
 
   app.get('/origens/:dtInicial/:dtFinal', recordingController.listaOrigem);

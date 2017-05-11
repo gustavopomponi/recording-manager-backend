@@ -9,6 +9,7 @@ const express = require('express'),
       env = require('./config/env'),
       controllers = require('./controllers'),
       routes = require('./routes'),
+      player = require('play-sound');
 
 app.use(logger('dev'));
 
