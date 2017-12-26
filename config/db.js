@@ -18,9 +18,9 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 //Models/tables
-/*
-db.cliente = require('../models/cliente')(sequelize,Sequelize);
-db.clienteendereco = require('../models/clienteendereco')(sequelize,Sequelize);
+
+//db.recordings = require('../models/recordings')(sequelize,Sequelize);
+/*db.clienteendereco = require('../models/clienteendereco')(sequelize,Sequelize);
 db.endereco = require('../models/endereco')(sequelize,Sequelize);
 db.formapagamento = require('../models/formapagamento')(sequelize,Sequelize);
 db.grupoproduto = require('../models/grupo')(sequelize,Sequelize);

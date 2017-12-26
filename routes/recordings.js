@@ -4,21 +4,18 @@ const recordingController = require('../controllers').recordings;
 
 module.exports = (app, db) => {
 
-  // GET All Calls
-  app.get('/recordings', recordingController.lista);
+  app.post('/gravacoes', recordingController.busca);
 
-  app.get('/play', recordingController.playaudio);
+  //app.get('/dispositions', recordingController.listaDisposition);
 
-  app.get('/dispositions', recordingController.listaDisposition);
+  //app.get('/origens/:ramal/:dtInicial/:dtFinal', recordingController.listaOrigem);
 
-  app.get('/origens/:dtInicial/:dtFinal', recordingController.listaOrigem);
-
-  app.get('/destinos/:dtInicial/:dtFinal/:source', recordingController.listaDestino);
+  //app.get('/destinos/:dtInicial/:dtFinal/:source', recordingController.listaDestino);
 
   // GET Calls by date interval
   //app.get('/recordings/:dt_inicial/:dt_final/:src?/:dst?/:status?', recordingController.busca);
 
-  app.get(/\/recordings\/(.*)\/(.*)\/(.*)\/(.*)\/(.*)/, function(req, res) {
+  /*app.get(/\/recordings\/(.*)\/(.*)\/(.*)\/(.*)\/(.*)/, function(req, res) {
 
     var parametros = [];
 

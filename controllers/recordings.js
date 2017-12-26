@@ -7,32 +7,33 @@ const ms = require('mediaserver');
 
 var sequelize = db.sequelize;
 
-   exports.playaudio = function(req,res){
 
-      ms.pipe(req, res, "./audio/out-0999553028-2010-20170502-090412-1493726652.1057.wav");
+      //Primeira Função executada ao abrir a aplicação
+      exports.listaPorRamal = function(req,res){
 
-   }
+           sequelize.query('SELECT cast(calldate as date) as calldate, '
+                           +'cast(calldate as time) as calltime,	'
+                           +'src, dst,	duration,	disposition, recordingfile FROM cdr '
+                           +'WHERE dst = :ramal AND '
+                            +'cast(calldate as date) BETWEEN :dtInicial AND :dtFinal '
+                           +'AND char_length(recordingfile) > 1 '
+                           +'UNION '
+                           +'SELECT cast(calldate as date) as calldate, '
+                           +'cast(calldate as time) as calltime,	'
+                           +'src, dst,	duration,	disposition, recordingfile FROM cdr '
+                           +'WHERE src = :ramal AND '
+                           +'cast(calldate as date) BETWEEN :dtInicial AND :dtFinal '
+                           +'AND char_length(recordingfile) > 1 ',
+                    {
+                      replacements: { ramal: req.body.ramal, dtInicial: req.body.dtInicial , dtFinal: req.body.dtFinal },
+                      type: sequelize.QueryTypes.SELECT
+                    })
+                       .then(recs => res.status(201).send(recs))
+                       .catch(error => res.status(400).send(error));
 
-//	player.play('../audio/out-0999553028-2010-20170502-090412-1493726652.1057.wav', function(err){
-  		//if (err) throw err
-//	});
+        },
 
-	//play.usePlayer('mplayer');
-	//play.sound('../audio/out-0999553028-2010-20170502-090412-1493726652.1057.wav');
-
-//    },
-
-    exports.lista = function(req,res){
-
-         sequelize.query('SELECT cast(calldate as date) as calldate,	src, dst,	duration,	disposition FROM cdr WHERE LENGTH(dst) > 5',
-                  {
-                    type: sequelize.QueryTypes.SELECT
-                  })
-                     .then(recs => res.status(201).send(recs))
-                     .catch(error => res.status(400).send(error));
-
-      },
-
+      // Função executada para listar todas as dispositions disponíveis para filtro
       exports.listaDisposition = function(req,res){
 
            sequelize.query('select DISTINCT(disposition) from cdr',{ type: sequelize.QueryTypes.SELECT })
@@ -41,11 +42,16 @@ var sequelize = db.sequelize;
 
         },
 
+      // Função executada para listar todas as origens disponíveis para filtro
       exports.listaOrigem = function(req,res){
 
-             sequelize.query('select DISTINCT(src) from cdr WHERE dst <> "s" AND cast(calldate as date) between :inicial and :final AND length(recordingfile) > 1',
+             sequelize.query('select DISTINCT(src) from cdr WHERE dst <> "s" '
+                             +' AND cast(calldate as date) between :inicial and :final'
+                             +' AND dst = :ramal'
+                             +' AND char_length(recordingfile) > 1',
                      { replacements: { inicial: req.params.dtInicial,
-                                       final: req.params.dtFinal },
+                                       final: req.params.dtFinal,
+                                       ramal: req.params.ramal},
                                        type: sequelize.QueryTypes.SELECT
                      })
                          .then(recs => res.status(201).send(recs))
@@ -53,6 +59,7 @@ var sequelize = db.sequelize;
 
           },
 
+      // Função executada para listar todos os destinos disponíveis para filtro
       exports.listaDestino = function(req,res){
 
                  sequelize.query('select DISTINCT(dst) from cdr WHERE dst <> "s" AND cast(calldate as date) between :inicial and :final AND src = :source and length(recordingfile) > 1',
@@ -66,43 +73,33 @@ var sequelize = db.sequelize;
 
               },
 
+
      exports.busca = function(req,res){
 
-        var querytext =      'SELECT	calldate,'
-                            +' src, dst,	duration,'
-                            +' billsec, disposition, recordingfile FROM cdr'
-                            +' WHERE cast(calldate as date)'
-                            +' between :inicial and :final and'
-                            +' dst <> "s" and'
-                            +' length(recordingfile) > 1';
+            var querytext =  'select '
+          	                      +'cast(cd.calldate as date) as calldate, '
+          	                      +'cd.src, '
+          	                      +'cd.dst, '
+          	                      +'cd.duration, '
+          	                      +'cd.disposition, '
+                                  +'cd.recordingfile '
+                              +'from '
+                              	+'cdr as cd '
+                              +'where '
+                              	+'(cd.src = :ramal or cd.dst = :ramal) and '
+                              	+'(cast(cd.calldate as date) between :dtInicial and :dtFinal) and '
+                              	+'length(cd.recordingfile) > 0 and '
+                              	+'cd.disposition = ' + "'ANSWERED'" ;
 
-          if( req.src.length > 1){
 
-            querytext = querytext + ' and src = :src';
+            sequelize.query(querytext,
+                                  { replacements: {          ramal: req.body.ramal,
+                                                         dtInicial: req.body.dtInicial,
+                                                           dtFinal: req.body.dtFinal },
+                                                         type: sequelize.QueryTypes.SELECT })
+                                  .then(recs => res.status(201).send(recs))
+                                  .catch(error => res.status(400).send(error));
 
-          }
-
-          if( req.dst.length > 1){
-
-            querytext = querytext + ' and dst = :dst';
-
-          }
-
-          if( req.status.length > 1){
-
-            querytext = querytext + ' and disposition = :status';
-
-          }
-
-          sequelize.query(querytext,
-                                { replacements: { inicial: req.dt_inicial,
-                                                    final: req.dt_final,
-                                                      src: req.src,
-                                                      dst: req.dst,
-                                                   status: req.status },
-                                                     type: sequelize.QueryTypes.SELECT })
-                                .then(recs => res.status(201).send(recs))
-                                .catch(error => res.status(400).send(error));
 
       }
 
