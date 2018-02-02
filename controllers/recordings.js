@@ -87,10 +87,10 @@ var sequelize = db.sequelize;
                                   +'case '
                                   +'when length(cd.recordingfile) > 70 '
                                   +'then concat(' + "'" + 'http://recfiles.expocaccer.net/' + "'" + ',SUBSTRING_INDEX(cd.recordingfile,'+ "'" + '/' + "'" +',-4)) '
-                                  +'else concat(' + "'" + 'http://recfiles.expocaccer.net/' + "'" + 
-                                  ',SUBSTRING(SUBSTRING_INDEX(SUBSTRING_INDEX(cd.recordingfile,'+"'"+'-'+"'"+',-3),'+"'"+'-'+"'"+',1),1,4),'+'/'+
-                                  ',SUBSTRING(SUBSTRING_INDEX(SUBSTRING_INDEX(cd.recordingfile,'+"'"+'-'+"'"+',-3),'+"'"+'-'+"'"+',1),5,2),'+'/'+
-                                  ',SUBSTRING(SUBSTRING_INDEX(SUBSTRING_INDEX(cd.recordingfile,'+"'"+'-'+"'"+',-3),'+"'"+'-'+"'"+',1),7,2),'+'/'+
+                                  +'else concat(' + "'" + 'http://recfiles.expocaccer.net/' + "'" +
+                                  ',SUBSTRING(SUBSTRING_INDEX(SUBSTRING_INDEX(cd.recordingfile,'+"'"+'-'+"'"+',-3),'+"'"+'-'+"'"+',1),1,4),'+"'"+'/'+"'"+
+                                  ',SUBSTRING(SUBSTRING_INDEX(SUBSTRING_INDEX(cd.recordingfile,'+"'"+'-'+"'"+',-3),'+"'"+'-'+"'"+',1),5,2),'+"'"+'/'+"'"+
+                                  ',SUBSTRING(SUBSTRING_INDEX(SUBSTRING_INDEX(cd.recordingfile,'+"'"+'-'+"'"+',-3),'+"'"+'-'+"'"+',1),7,2),'+"'"+'/'+"'"+
                                   ',cd.recordingfile) '
                                   +'end as filepath, '
                                   +'uniqueid '
