@@ -13,14 +13,14 @@ var sequelize = db.sequelize;
 
            sequelize.query('SELECT cast(calldate as date) as calldate, '
                            +'cast(calldate as time) as calltime,	'
-                           +'src, dst,	duration,	disposition, recordingfile FROM cdr '
+                           +'src, dst,	billsec,	disposition, recordingfile FROM cdr '
                            +'WHERE dst = :ramal AND '
                             +'cast(calldate as date) BETWEEN :dtInicial AND :dtFinal '
                            +'AND char_length(recordingfile) > 1 '
                            +'UNION '
                            +'SELECT cast(calldate as date) as calldate, '
                            +'cast(calldate as time) as calltime,	'
-                           +'src, dst,	duration,	disposition, recordingfile FROM cdr '
+                           +'src, dst,	billsec,	disposition, recordingfile FROM cdr '
                            +'WHERE src = :ramal AND '
                            +'cast(calldate as date) BETWEEN :dtInicial AND :dtFinal '
                            +'AND char_length(recordingfile) > 1 ',
@@ -81,7 +81,7 @@ var sequelize = db.sequelize;
                                   +'cast(cd.calldate as time) as calltime, '
           	                      +'cd.src, '
           	                      +'cd.dst, '
-          	                      +'cd.duration, '
+          	                      +'cd.billsec, '
           	                      +'cd.disposition, '
                                   +'cd.recordingfile, '
                                   +'case '
@@ -97,10 +97,36 @@ var sequelize = db.sequelize;
                               +'from '
                               	+'cdr as cd '
                               +'where '
-                              	+'(cd.src = :ramal or cd.dst = :ramal) and '
+                              	+'(cd.src = :ramal) and '
                               	+'(cast(cd.calldate as date) between :dtInicial and :dtFinal) and '
                               	+'length(cd.recordingfile) > 0 and '
-                              	+'cd.disposition = ' + "'ANSWERED'" ;
+                              	+'cd.disposition = ' + "'ANSWERED'"
+                                +' UNION '
+                                +'select '
+                                  +'cast(cd.calldate as date) as calldate, '
+                                  +'cast(cd.calldate as time) as calltime, '
+                                  +'cd.src, '
+                                  +'cd.dst, '
+                                  +'cd.billsec, '
+                                  +'cd.disposition, '
+                                  +'cd.recordingfile, '
+                                  +'case '
+                                  +'when length(cd.recordingfile) > 70 '
+                                  +'then concat(' + "'" + 'http://recfiles.expocaccer.net/' + "'" + ',SUBSTRING_INDEX(cd.recordingfile,'+ "'" + '/' + "'" +',-4)) '
+                                  +'else concat(' + "'" + 'http://recfiles.expocaccer.net/' + "'" +
+                                  ',SUBSTRING(SUBSTRING_INDEX(SUBSTRING_INDEX(cd.recordingfile,'+"'"+'-'+"'"+',-3),'+"'"+'-'+"'"+',1),1,4),'+"'"+'/'+"'"+
+                                  ',SUBSTRING(SUBSTRING_INDEX(SUBSTRING_INDEX(cd.recordingfile,'+"'"+'-'+"'"+',-3),'+"'"+'-'+"'"+',1),5,2),'+"'"+'/'+"'"+
+                                  ',SUBSTRING(SUBSTRING_INDEX(SUBSTRING_INDEX(cd.recordingfile,'+"'"+'-'+"'"+',-3),'+"'"+'-'+"'"+',1),7,2),'+"'"+'/'+"'"+
+                                  ',cd.recordingfile) '
+                                  +'end as filepath, '
+                                  +'uniqueid '
+                              +'from '
+                                +'cdr as cd '
+                              +'where '
+                                +'(cd.dst = :ramal) and '
+                                +'(cast(cd.calldate as date) between :dtInicial and :dtFinal) and '
+                                +'length(cd.recordingfile) > 0 and '
+                                +'cd.disposition = ' + "'ANSWERED'"
 
 
             sequelize.query(querytext,
